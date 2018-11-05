@@ -17,14 +17,15 @@ ENV SQUIDGUARD_FILTER="adv spyware tracker"
 RUN yum --quiet --assumeyes update && \
   yum --quiet --assumeyes install epel-release && \
   yum --quiet --assumeyes --setopt=tsflags=nodocs install wget gcc gcc-c++ make perl curl openssl-devel tar iproute iptables sudo && \
-  rm -rf /tmp/* /var/tmp/* /var/log/*
+  cd /tmp/ && \
   wget http://www.squid-cache.org/Versions/v4/squid-4.4.tar.gz && \
   tar xvf squid-4.4.tar.gz && \
   cd squid-4.4 && \
   ./configure --enable-ssl-crtd --with-openssl && \
   make && \
   make install && \
-  useradd squid
+  useradd squid && \
+  rm -rf /tmp/* /var/tmp/* /var/log/*
 
 
 ADD ./bin /usr/local/bin
