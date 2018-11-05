@@ -28,6 +28,7 @@ RUN yum --quiet --assumeyes update && \
   cd /tmp/ && \
   wget http://www.squidguard.org/Downloads/squidGuard-1.4.tar.gz && \
   tar xvf squidGuard-1.4.tar.gz && \
+  cd squidGuard-1.4 && \
   ./configure && \
   make && \
   mame install && \
