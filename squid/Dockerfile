@@ -26,7 +26,6 @@ RUN yum --quiet --assumeyes update && \
   make install && \
   useradd squid && \
   cd /tmp/ && \
-  rpm -Uvh https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm && \
   yum --quiet --assumeyes install squidGuard && \
   rm -rf /tmp/* /var/tmp/* /var/log/*
 
