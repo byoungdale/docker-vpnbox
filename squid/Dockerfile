@@ -26,12 +26,8 @@ RUN yum --quiet --assumeyes update && \
   make install && \
   useradd squid && \
   cd /tmp/ && \
-  wget http://www.squidguard.org/Downloads/squidGuard-1.4.tar.gz && \
-  tar xvf squidGuard-1.4.tar.gz && \
-  cd squidGuard-1.4 && \
-  ./configure && \
-  make && \
-  mame install && \
+  rpm -Uvh https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm && \
+  yum --quiet --assumeyes install squidGuard && \
   rm -rf /tmp/* /var/tmp/* /var/log/*
 
 
