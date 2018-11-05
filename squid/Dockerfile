@@ -11,20 +11,21 @@ ENV SQUIDGUARD_FILTER="adv spyware tracker"
 # Disable this to use the release version of Squid (e.g. as soon as Squid 4 is released)
 # ADD ./repos.d/squid-cache-beta.repo /etc/yum.repos.d
 
+# installing Squid from source because it's the only way to set the 
+#  --enable-ssl-crtd --with-openssl
+# flags for 'security_file_certgen' to be installed
 RUN yum --quiet --assumeyes update && \
   yum --quiet --assumeyes install epel-release && \
-  yum --quiet --assumeyes --setopt=tsflags=nodocs install wget gcc gcc-c++ make perl curl openssl tar iproute iptables sudo && \
+  yum --quiet --assumeyes --setopt=tsflags=nodocs install wget gcc gcc-c++ make perl curl openssl-devel tar iproute iptables sudo && \
   rm -rf /tmp/* /var/tmp/* /var/log/*
-
-# install squid from source
-RUN cd /tmp/ && \
-    wget http://www.squid-cache.org/Versions/v4/squid-4.4.tar.gz && \
-    tar xvf squid-4.4.tar.gz && \
-    cd squid-4.4 && \
-    ./configure --enable-ssl-crtd --with-openssl && \
-    make && \
-    make install && \
-    useradd squid
+  cd /tmp/ && \
+  wget http://www.squid-cache.org/Versions/v4/squid-4.4.tar.gz && \
+  tar xvf squid-4.4.tar.gz && \
+  cd squid-4.4 && \
+  ./configure --enable-ssl-crtd --with-openssl && \
+  make && \
+  make install && \
+  useradd squid
 
 
 ADD ./bin /usr/local/bin
