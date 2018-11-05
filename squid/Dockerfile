@@ -25,13 +25,17 @@ RUN yum --quiet --assumeyes update && \
   make && \
   make install && \
   useradd squid && \
+  cd /tmp/ && \
+  wget http://www.squidguard.org/Downloads/squidGuard-1.4.tar.gz && \
+  tar xvf squidGuard-1.4.tar.gz && \
+  ./configure && \
+  make && \
+  mame install && \
   rm -rf /tmp/* /var/tmp/* /var/log/*
 
 
 ADD ./bin /usr/local/bin
 ADD ./etc /etc/squid
-
-RUN yum --quiet --assumeyes squid-helpers squidGuard
 
 # 3128 = standard explicit proxy (http)
 # 3129 = TPROXY  (transparent proxy for http traffic)
