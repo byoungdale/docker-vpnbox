@@ -16,7 +16,7 @@ ENV SQUIDGUARD_FILTER="adv spyware tracker"
 # flags for 'security_file_certgen' to be installed
 RUN yum --quiet --assumeyes update && \
   yum --quiet --assumeyes install epel-release && \
-  yum --quiet --assumeyes --setopt=tsflags=nodocs install wget gcc gcc-c++ make perl curl openssl-devel tar iproute iptables sudo && \
+  yum --quiet --assumeyes --setopt=tsflags=nodocs install wget gcc gcc-c++ make perl curl openssl openssl-devel tar iproute iptables sudo && \
   cd /tmp/ && \
   wget http://www.squid-cache.org/Versions/v4/squid-4.4.tar.gz && \
   tar xvf squid-4.4.tar.gz && \
