@@ -27,17 +27,18 @@ function run_or_exit {
 }
 
 # intercept for TPROXY mode
-#   Note: requires packets routed properly from openvpn container
+#   Note: requires packets routed properly from STRONGSWAN container
 function f_setup_intercept {
+  VPNIPPOOL="10.10.10.0/24"
   SQUID_IP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
   if [[ $? -ne 0 || -z "$SQUID_IP" ]]; then
     echo 'ERROR: Could not determine own IP. Should not happen!'
     exit 1
   fi
-  # openvpn IP known via docker-compose service network specific DNS
-  OPENVPN_IP=$(getent hosts openvpn | head -n 1 | cut -d ' ' -f 1)
-  if [[ $? -ne 0 || -z "$OPENVPN_IP" ]]; then
-    echo 'ERROR: Could not determine Openvpn IP. Make sure to start service with docker-compose!'
+  # STRONGSWAN IP known via docker-compose service network specific DNS
+  STRONGSWAN_IP=$(getent hosts strongswan | head -n 1 | cut -d ' ' -f 1)
+  if [[ $? -ne 0 || -z "$STRONGSWAN_IP" ]]; then
+    echo 'ERROR: Could not determine STRONGSWAN IP. Make sure to start service with docker-compose!'
     exit 1
   fi
   # Setup a chain DIVERT to mark packets
@@ -50,7 +51,7 @@ function f_setup_intercept {
   run_or_exit "iptables -t mangle -A PREROUTING -p tcp --dport 80 -j TPROXY --tproxy-mark 0x1/0x1 --on-port 3129"
   run_or_exit "iptables -t mangle -A PREROUTING -p tcp --dport 443 -j TPROXY --tproxy-mark 0x1/0x1 --on-port 3130"
 
-  run_or_exit "iptables -t nat -A POSTROUTING -s 10.128.81.0/24 -o eth0 -p tcp -m tcp -m multiport --dports 80,443 -j SNAT --to-source $SQUID_IP"
+  run_or_exit "iptables -t nat -A POSTROUTING -s $VPNIPPOOL -o eth0 -p tcp -m tcp -m multiport --dports 80,443 -j SNAT --to-source $SQUID_IP"
   # and finally route to Squid
   run_or_exit "ip -f inet rule add fwmark 1 lookup 100"
   run_or_exit "ip -f inet route add local default dev lo table 100"
@@ -66,8 +67,8 @@ function f_setup_intercept {
   #run_or_exit "ip -f inet6 rule add fwmark 1 lookup 100"
   #run_or_exit "ip -f inet6 route add local default dev lo table 100"
 
-  # route for traffic back to openvpn container
-  ip route add 10.128.81.0/24 via $OPENVPN_IP
+  # route for traffic back to STRONGSWAN container
+  ip route add $VPNIPPOOL via $STRONGSWAN_IP
 }
 
 # return the CA in X.509 format, e.g. to import into Windows

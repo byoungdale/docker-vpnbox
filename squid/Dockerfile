@@ -1,22 +1,16 @@
 # Build a docker image for squid proxy
-FROM centos:latest
-
-MAINTAINER Sebastian Weitzel <sebastian.weitzel@gmail.com>
+FROM ubuntu:latest
 
 WORKDIR /tmp
 
 # Define which filters to use, check http://www.shallalist.de/categories.html for a list
 ENV SQUIDGUARD_FILTER="adv spyware tracker"
 
-# Disable this to use the release version of Squid (e.g. as soon as Squid 4 is released)
-# ADD ./repos.d/squid-cache-beta.repo /etc/yum.repos.d
-
 # installing Squid from source because it's the only way to set the 
 #  --enable-ssl-crtd --with-openssl
 # flags for 'security_file_certgen' to be installed
-RUN yum --quiet --assumeyes update && \
-  yum --quiet --assumeyes install epel-release && \
-  yum --quiet --assumeyes --setopt=tsflags=nodocs install wget gcc gcc-c++ make perl curl openssl openssl-devel tar iproute iptables sudo && \
+RUN apt-get update && \
+  apt-get install wget gcc gcc-c++ make perl curl openssl tar iproute iptables sudo && \
   cd /tmp/ && \
   wget http://www.squid-cache.org/Versions/v4/squid-4.4.tar.gz && \
   tar xvf squid-4.4.tar.gz && \
@@ -26,7 +20,7 @@ RUN yum --quiet --assumeyes update && \
   make install && \
   useradd squid && \
   cd /tmp/ && \
-  yum --quiet --assumeyes install squidGuard && \
+  apt-get install squidGuard && \
   rm -rf /tmp/* /var/tmp/* /var/log/*
 
 

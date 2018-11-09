@@ -22,46 +22,46 @@ networks:
         subnet: 192.168.50.0/24
 
 services:
-  dnsmasq:
-    hostname: dnsmasq
-    image: vpnbox_dnsmasq:latest
-    build: ./dnsmasq/
-    expose:
-      - "53/tcp"
-      - "53/udp"
-    cap_add:
-      - NET_ADMIN
-    volumes:
-      - data:/data
-    networks:
-      main:
-        ipv4_address: 192.168.50.2
+  # dnsmasq:
+  #   hostname: dnsmasq
+  #   image: vpnbox_dnsmasq:latest
+  #   build: ./dnsmasq/
+  #   expose:
+  #     - "53/tcp"
+  #     - "53/udp"
+  #   cap_add:
+  #     - NET_ADMIN
+  #   volumes:
+  #     - data:/data
+  #   networks:
+  #     main:
+  #      ipv4_address: 192.168.50.2
 
-  clamav:
-    hostname: clamav
-    image: vpnbox_clamav:latest
-    build: ./clamav/
-    expose:
-      - "3310/tcp"
-    volumes:
-      - data:/data
-    networks:
-      main:
-        ipv4_address: 192.168.50.3
+  # clamav:
+  #   hostname: clamav
+  #   image: vpnbox_clamav:latest
+  #   build: ./clamav/
+  #   expose:
+  #     - "3310/tcp"
+  #   volumes:
+  #     - data:/data
+  #   networks:
+  #     main:
+  #       ipv4_address: 192.168.50.3
 
-  cicap:
-    hostname: cicap
-    image: vpnbox_cicap:latest
-    build: ./cicap/
-    depends_on:
-      - clamav
-    expose:
-      - "1344/tcp"
-    volumes:
-      - data:/data
-    networks:
-      main:
-        ipv4_address: 192.168.50.4
+  # cicap:
+  #   hostname: cicap
+  #   image: vpnbox_cicap:latest
+  #   build: ./cicap/
+  #   depends_on:
+  #     - clamav
+  #   expose:
+  #     - "1344/tcp"
+  #   volumes:
+  #     - data:/data
+  #   networks:
+  #     main:
+  #       ipv4_address: 192.168.50.4
 
   # Create Squid data container:
   #   > docker run -ti --rm --volume=dockervpnbox_data:/data --volume=dockervpnbox_squid_priv:/data-priv vpnbox_squid --init
@@ -71,9 +71,6 @@ services:
     hostname: squid
     image: vpnbox_squid:latest
     build: ./squid/
-    depends_on:
-      - cicap
-      - openvpn
     expose:
       - "3128/tcp"
       - "3129/tcp"
@@ -92,19 +89,36 @@ services:
   #     > docker run -ti --rm --volume=dockervpnbox_data:/data --volume=dockervpnbox_openvpn_priv:/data-priv vpnbox_openvpn --init=udp://vpn.example.com:5443
   #   Create client config:
   #     > docker run -ti --rm --volume=dockervpnbox_data:/data --volume=dockervpnbox_openvpn_priv:/data-priv vpn-box/openvpn --getclient client01
-  openvpn:
-    hostname: openvpn
-    image: vpnbox_openvpn:latest
-    build: ./openvpn/
-    depends_on:
-      - dnsmasq
+  #openvpn:
+  #  hostname: openvpn
+  #  image: vpnbox_openvpn:latest
+  #  build: ./openvpn/
+  #  depends_on:
+  #    - dnsmasq
+  #  cap_add:
+  #    - NET_ADMIN
+  #  ports:
+  #    - "5443:1194/udp"
+  #  volumes:
+  #    - data:/data
+  #    - openvpn_priv:/data-priv
+  #  networks:
+  #    main:
+  #      ipv4_address: 192.168.50.6
+  
+  strongswan:
+    hostname: strongswan
+    image: vpnbox_strongswan:latest
+    build: ./strongswan/
     cap_add:
       - NET_ADMIN
     ports:
-      - "5443:1194/udp"
+      - "4500/udp" 
+      - "500/udp" 
+      - "1701/udp"
     volumes:
       - data:/data
-      - openvpn_priv:/data-priv
+      - strongswan_priv:/data-priv
     networks:
       main:
         ipv4_address: 192.168.50.6
