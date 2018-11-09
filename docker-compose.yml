@@ -6,8 +6,8 @@ version: '3'
 volumes:
   # All: logs, ClamAV db
   data:
-  # OpenVPN private data: VPN CA + client certificates
-  openvpn_priv:
+  # StrongSwan private data: VPN CA + client certificates
+  strongswan_priv:
   # Squid private data: Squid SSL bump CA,
   squid_priv:
 
